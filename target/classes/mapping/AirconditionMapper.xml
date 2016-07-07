@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.biac.trace.dao.AirconditionMapper">
+  <select id="getWorkFreq1" resultType="java.lang.Float">
+    SELECT value FROM  zz4028e4a947c7b2ff0147f82c40a3017b
+  </select>
+  <select id="getWorkFreq2" resultType="java.lang.Float">
+    SELECT value FROM  zz4028e4a947c7b2ff0147f87a2e0b0249
+  </select>
+  <select id="getWorkFreq3" resultType="java.lang.Float">
+    SELECT value FROM  zz4028e4a947c7b2ff0147f901d98402d4
+  </select>
+  <select id="getWorkFreq" parameterType="java.util.HashMap" resultType="java.lang.Float">
+    SELECT ${valueName} FROM  ${tableName} where ac_id = ${ac_id} 
+  </select>
+  <select id="getWorkStatus" parameterType="java.util.HashMap" resultType="java.util.Map">
+    SELECT ${valueNames} FROM  ${tableName}
+  </select>
+</mapper>

@@ -1,0 +1,95 @@
+body,html,div,p,a,h1,h2,h3,h4,h5,h6 ,th,td,label,input{
+	font-family: 黑体;
+}
+
+tr > td {
+	height: 3em;
+}
+
+p > a {
+	color: white;
+}
+
+#footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 50px;
+	clear:both;
+}
+
+.width-middle {
+	max-width: 100px;
+}
+
+.width-small {
+	max-width: 75px;
+}
+
+.big-font {
+	font-size: 30px;
+}
+
+.inline-display {
+	display: inline;
+}
+
+.m-padding {
+	padding: 30px;
+}
+
+.s-top-margin {
+	margin-top: 10px;
+}
+.s-left-margin {
+	margin-left: 10px;
+}
+.s-bottom-margin {
+	margin-bottom: 10px;
+}
+.s-right-margin {
+	margin-right: 10px;
+}
+
+.m-top-margin {
+	margin-top: 30px;
+}
+.m-left-margin {
+	margin-left: 30px;
+}
+.m-bottom-margin {
+	margin-bottom: 30px;
+}
+.m-right-margin {
+	margin-right: 30px;
+}
+
+.l-top-margin {
+	margin-top: 60px;
+}
+
+.white-font {
+	color: white;
+}
+
+.solid-border {
+	border: 2px solid white;
+}
+
+.center-text {
+	text-align: center;
+}
+.right-align {
+	float: right;
+}
+.left-float {
+	float: left;
+}
+.right-float {
+	float: right;
+}
+.vertical-align {
+	clear: both;
+	float: left;
+}

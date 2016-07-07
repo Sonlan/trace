@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.biac.trace.dao.UserMapper">
+   <resultMap type="org.biac.trace.entity.User" id="BaseResultMap">
+     <id column="id" property="id" jdbcType="INTEGER"/>
+     <result column="level" property="level" jdbcType="TINYINT"/>
+     <result column="username" property="username" jdbcType="VARCHAR"/>
+     <result column="password" property="password" jdbcType="VARCHAR"/>
+     <result column="create_time" property="create_time" jdbcType="TIMESTAMP"/>
+     <result column="update_time" property="update_time" jdbcType="TIMESTAMP"/>
+   </resultMap>
+
+  <delete id="deleteUserByName" parameterType="java.lang.String">
+  	delete from user where username = #{username}
+  </delete>
+  <update id="updateUser" parameterType="java.util.HashMap">
+  	update user
+  	set password = #{password}
+  	where username = #{username}
+  </update>
+  <select id="getUserByName" parameterType="java.util.HashMap" resultType="org.biac.trace.entity.User">
+    SELECT * FROM user
+    <where>
+		1=1
+		<if test="username != null and username != '' ">
+			<![CDATA[ AND username = #{username} ]]>
+		</if>
+	</where>
+	limit ${pageStart},${pageEnd}
+  </select>
+  
+  <select id="getUserByName1" parameterType="java.util.HashMap" resultType="org.biac.trace.entity.User">
+    SELECT * FROM user
+    <where>
+		1=1
+		<if test="username != null and username != '' ">
+			<![CDATA[ AND username = #{username} ]]>
+		</if>
+	</where>
+  </select>
+  
+  <select id="userExist" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+    SELECT * FROM user
+	<where>
+		1=1
+		<if test="username != null and username != '' ">
+			<![CDATA[ AND username = #{username} ]]>
+		</if>
+		<if test="password != null and password != '' ">
+			<![CDATA[ AND password = #{password} ]]>
+		</if>
+	</where>
+  </select>
+  <select id="userRepeat" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+    SELECT * FROM user
+	<where>
+		1=1
+		<if test="username != null and username != '' ">
+			<![CDATA[ AND username = #{username} ]]>
+		</if>
+	</where>
+  </select>
+  
+  <insert id="insert" parameterType="java.util.HashMap">
+        INSERT INTO user
+        (level,username,password) VALUES
+        (#{level},#{username},#{password})
+   </insert>
+  
+</mapper>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd"                                        
+		default-lazy-init="true">
+
+	<description>Spring公共配置 </description>
+	<!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
+	<context:component-scan base-package="org.biac.trace">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
+	<context:property-placeholder ignore-resource-not-found="true"
+			location="classpath:config/application.properties" />
+	
+	<!-- MyBatis配置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
+		<property name="typeAliasesPackage" value="org.biac.trace.entity" />
+		<!-- 显式指定Mapper文件位置 -->
+		<property name="mapperLocations" value="classpath:mapping/*Mapper.xml" />
+	</bean>
+	<!-- 扫描basePackage下所有 接口-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="org.biac.trace.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+	
+	<!-- 使用annotation定义事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+	
+	<!-- 定义aspectj -->
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+	
+	<!-- 使用静态变量缓存 applicationContext -->
+	<!--<bean class="org.core.modules.utils.SpringContextHolder" lazy-init="false" />-->
+
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	
+	<!-- 动态数据源 -->  
+        <bean id="dataSource" class="org.biac.trace.utils.DynamicDataSource">
+            <property name="targetDataSources">  
+	            <map key-type="java.lang.String">  
+	                <entry key="aimin"   value-ref="baseDataSource" />
+	                <entry key="aimin00" value-ref="dataSource00" /> 
+	            </map>  
+	        </property>  
+	        <property name="defaultTargetDataSource" ref="baseDataSource" />  
+	    </bean>
+	    <!-- 数据源配置--> 
+        <bean id="baseDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+            <property name="driverClass">
+                <value>${jdbc.driver}</value>
+            </property>
+            <property name="jdbcUrl">
+                <value>${jdbc.url}</value>
+            </property>
+            <property name="user">
+                <value>${jdbc.username}</value>
+            </property>
+            <property name="password">
+                <value>${jdbc.password}</value>
+            </property>
+            
+            <!--连接池中保留的最大连接数。默认值: 15 -->   
+            <property name="maxPoolSize" value="${c3p0.maxPoolSize}"/>  
+            <!-- 连接池中保留的最小连接数，默认为：3-->  
+            <property name="minPoolSize" value="${c3p0.minPoolSize}"/>  
+            <!-- 初始化连接池中的连接数，取值应在minPoolSize与maxPoolSize之间，默认为3-->  
+            <property name="initialPoolSize" value="${c3p0.initialPoolSize}"/>  
+    
+            <!--最大空闲时间，60秒内未使用则连接被丢弃。若为0则永不丢弃。默认值: 0 -->   
+            <property name="maxIdleTime" value="${c3p0.maxIdleTime}" />  
+                              
+            <!-- 当连接池连接耗尽时，客户端调用getConnection()后等待获取新连接的时间，超时后将抛出SQLException，如设为0则无限期等待。单位毫秒。默认: 0 -->   
+            <property name="checkoutTimeout" value="${c3p0.checkoutTimeout}"/> 
+            
+            <!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。默认值: 3 -->   
+            <property name="acquireIncrement" value="${c3p0.acquireIncrement}"/>  
+               
+            <!--每60秒检查所有连接池中的空闲连接。默认值: 0，不检查 -->   
+            <property name="idleConnectionTestPeriod" value="${c3p0.idleConnectionTestPeriod}"/>  
+            <!--c3p0全局的PreparedStatements缓存的大小。如果maxStatements与maxStatementsPerConnection均为0，则缓存不生效，只要有一个不为0，则语句的缓存就能生效。如果默认值: 0-->   
+            <property name="maxStatements" value="${c3p0.maxStatements}"/>   
+        </bean> 
+        <bean id="dataSource00" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+            <property name="driverClass">
+                <value>${jdbc.driver}</value>
+            </property>
+            <property name="jdbcUrl">
+                <value>${jdbc.url00}</value>
+            </property>
+            <property name="user">
+                <value>${jdbc.username00}</value>
+            </property>
+            <property name="password">
+                <value>${jdbc.password00}</value>
+            </property>
+            
+            <!--连接池中保留的最大连接数。默认值: 15 -->   
+            <property name="maxPoolSize" value="${c3p0.maxPoolSize}"/>  
+            <!-- 连接池中保留的最小连接数，默认为：3-->  
+            <property name="minPoolSize" value="${c3p0.minPoolSize}"/>  
+            <!-- 初始化连接池中的连接数，取值应在minPoolSize与maxPoolSize之间，默认为3-->  
+            <property name="initialPoolSize" value="${c3p0.initialPoolSize}"/>  
+    
+            <!--最大空闲时间，60秒内未使用则连接被丢弃。若为0则永不丢弃。默认值: 0 -->   
+            <property name="maxIdleTime" value="${c3p0.maxIdleTime}" />  
+                              
+            <!-- 当连接池连接耗尽时，客户端调用getConnection()后等待获取新连接的时间，超时后将抛出SQLException，如设为0则无限期等待。单位毫秒。默认: 0 -->   
+            <property name="checkoutTimeout" value="${c3p0.checkoutTimeout}"/> 
+            
+            <!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。默认值: 3 -->   
+            <property name="acquireIncrement" value="${c3p0.acquireIncrement}"/>  
+               
+            <!--每60秒检查所有连接池中的空闲连接。默认值: 0，不检查 -->   
+            <property name="idleConnectionTestPeriod" value="${c3p0.idleConnectionTestPeriod}"/>  
+            <!--c3p0全局的PreparedStatements缓存的大小。如果maxStatements与maxStatementsPerConnection均为0，则缓存不生效，只要有一个不为0，则语句的缓存就能生效。如果默认值: 0-->   
+            <property name="maxStatements" value="${c3p0.maxStatements}"/>   
+        </bean>
+
+</beans>

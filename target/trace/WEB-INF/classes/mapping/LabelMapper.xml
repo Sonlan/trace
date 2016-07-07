@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.biac.trace.dao.LabelMapper">
+   <resultMap type="org.biac.trace.entity.Label" id="BaseResultMap">
+     <id column="id" property="id" jdbcType="VARCHAR"/>
+     <result column="activate_date" property="activate_date" jdbcType="TIMESTAMP"/>
+     <result column="aliveTime" property="aliveTime" jdbcType="VARCHAR"/>
+     <result column="washRemain" property="washRemain" jdbcType="INTEGER"/>
+     <result column="inuse" property="inuse" jdbcType="TINYINT"/>
+     <result column="alive" property="alive" jdbcType="TINYINT"/>
+     <result column="scrap_time" property="scrap_time" jdbcType="TIMESTAMP"/>
+   </resultMap>
+	
+  <sql id="Base_Column_List">
+    id,aliveTime,washRemain,activate_date,inuse,alive,scrap_time
+  </sql>
+  
+  <select id="getLabelByAcId" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" /> 
+    FROM label WHERE id LIKE '${id}%'
+    and inuse=1
+    and alive=1
+  </select>
+  
+  <select id="getLabelById" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" /> 
+    FROM label WHERE id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="getLablesSizeById" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" /> 
+    FROM label
+    <where>
+    	1=1
+    	<if test="id != null and id != ''">
+    		and id = #{id,jdbcType=VARCHAR}
+    	</if>
+    	<if test="inuse != null and inuse != ''">
+    		and inuse = #{inuse,jdbcType=TINYINT}
+    	</if>
+    	<if test="alive != null and alive != ''">
+    		and alive = #{alive,jdbcType=TINYINT}
+    	</if>
+    	<if test="washRemain != null and washRemain != ''">
+    	<![CDATA[	and washRemain <= #{washRemain,jdbcType=TINYINT} ]]>
+    	</if>
+    	<if test="ac_id != null and ac_id != ''">
+    		and id LIKE '${ac_id}%'
+    	</if>
+    	<if test="level != null and level != ''">
+    		and substring(id,3,1) = '${level}'
+    	</if>
+    </where>
+  </select>
+  <select id="getLablesById" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" /> 
+    FROM label
+    <where>
+    	1=1
+    	<if test="id != null and id != ''">
+    		and id = #{id,jdbcType=VARCHAR}
+    	</if>
+    	<if test="inuse != null and inuse != ''">
+    		and inuse = #{inuse,jdbcType=TINYINT}
+    	</if>
+    	<if test="alive != null and alive != ''">
+    		and alive = #{alive,jdbcType=TINYINT}
+    	</if>
+    	<if test="ac_id != null and ac_id != ''">
+    		and id LIKE '${ac_id}%'
+    	</if>
+    	<if test="level != null and level != ''">
+    		and substring(id,3,1) = '${level}'
+    	</if>
+    	<if test="washRemain != null and washRemain != ''">
+    		<![CDATA[	and washRemain <= #{washRemain,jdbcType=TINYINT} ]]>
+    	</if>
+    </where>
+    ORDER BY washRemain asc
+  </select>
+  
+  <insert id="labelInsert" parameterType="java.util.HashMap">
+        INSERT INTO label
+        (id,aliveTime,washRemain) VALUES
+        (#{id,jdbcType=VARCHAR},#{aliveTime,jdbcType=VARCHAR},#{washRemain,jdbcType=INTEGER})
+   </insert>
+   
+   <update id="deployLabel" parameterType="java.util.HashMap" >
+    update label
+    set washRemain = #{washRemain,jdbcType=INTEGER},
+    inuse = 1,
+    aliveTime = #{aliveTime,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="removeLabel" parameterType="java.lang.String" >
+    update label
+    set inuse = 0
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="scrapLabel" parameterType="java.lang.String" >
+    update label
+    set alive = 0,
+    inuse = 0,
+    scrap_time = current_timestamp()
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateTimeOfLabel" parameterType="java.util.HashMap" >
+    update label
+    set aliveTime = #{aliveTime,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <delete id="deleteById" parameterType="java.lang.String">
+  	delete from label where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <update id="editLabel" parameterType="java.util.HashMap">
+  	update label 
+  	<set>
+  		<if test="label.aliveTime != null and label.aliveTime != '' ">
+  			aliveTime = #{label.aliveTime,jdbcType=VARCHAR},
+  		</if>
+  		<if test="label.activate_date != null and label.activate_date != '' ">
+  			activate_date = ${label.activate_date},
+  		</if>
+  		<if test="label.inuse != null and label.inuse != -1 ">
+  			inuse = ${label.inuse},
+  		</if>
+  		<if test="label.washRemain != null and label.washRemain != -1 ">
+  			washRemain = ${label.washRemain},
+  		</if>
+  		<if test="label.alive != null and label.alive != -1 ">
+  			alive = ${label.alive},
+  		</if>
+  		<if test="label.scrap_time != null and label.scrap_time != '' ">
+  			scrap_time = ${label.scrap_time},
+  		</if>
+  	</set>
+  	where id = ${label.id}
+  </update>
+</mapper>
